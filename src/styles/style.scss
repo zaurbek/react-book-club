@@ -1,9 +1,84 @@
 .profile_img {
     height: auto;
-    width: auto;
     margin-right: 15px !important;
     border-radius:2px;
 }
+.ui.menu {
+  margin-bottom: 0 !important;
+  border-radius: 0 !important;
+}
 .fa-book {
     margin-right: 5px;
+}
+
+.jumbotron {
+  height: 45vh;
+  width: 100%;
+  background-color: #48d09b;
+    padding: 0;
+    margin: 0;
+    display: -webkit-box;
+    display: -moz-box;
+    display: -ms-flexbox;
+    display: -webkit-flex;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #FFF8F8;
+}
+.jumbo-404 {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height:100%; 
+    overflow:hidden;
+}
+.jumbo-names {
+  display: flex;
+  flex-direction: column;  
+    justify-content: center; 
+    align-items: center;     
+    flex-grow: 1;
+    h1 {
+      font-size: 60px;
+    }
+    h4 {
+      font-size: 21px;
+    }
+}
+
+.jumbo-404-names {
+  display: flex;
+  flex-direction: column;  
+    justify-content: center; 
+    align-items: center;
+    height: 500px;     
+    h1 {
+      font-size: 60px;
+    }
+    h4 {
+      font-size: 21px;
+    }
+}
+.frontpage {
+  margin-top: 15px;
+  .features-list {
+    margin-bottom: 55px !important;
+  }
+  h4 {
+    font-weight: normal;
+    a {
+      color: #555;
+      &hover {
+        text-decoration: none;
+      }
+    }
+  }
+}
+
+.logo {
+  color: black;
+  :hover {
+    text-decoration: none;
+  }
 }

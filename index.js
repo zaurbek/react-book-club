@@ -10,6 +10,10 @@ const PORT = process.env.PORT || 8080;
 
 app.use('/',express.static(`${__dirname}/public`))
 
+app.get('/redirect/github/auth',(req,res)=>{
+  res.redirect('http://github.com/login/oauth/authorize?client_id=86aff9e326ea4271199d&redirect_uri=http%3A%2F%2F127.0.0.1%3A8080%2Fauth%2Fgithub&scope=user')
+})
+
 
 app.get('/auth/github', (req, res) => {
   if (req.query.error) {

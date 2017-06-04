@@ -29,7 +29,10 @@ export function githubLogin(token) {
 export const USER_LOGOUT = 'USER_LOGOUT';
 
 export function githubLogout() {
-  Cookies.remove('token');
+  Cookies.remove('token',()=>{
+    
+  });
+
   return {
     type: USER_LOGOUT,
   };
