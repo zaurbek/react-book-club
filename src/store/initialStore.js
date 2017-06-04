@@ -1,5 +1,8 @@
 let initialStore ={
-
+   auth: {
+      value: false,
+      user: {}
+    }
 }
 
 

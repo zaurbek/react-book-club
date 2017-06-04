@@ -4,6 +4,10 @@
   "main": "index.js",
   "author": "Zaurbek Zhakupov <zoollhub@gmail.com>",
   "license": "MIT",
+  "script": {
+    "start": "nodemon index.js",
+    "build": "webpack --progress --colors --watch"
+  },
   "devDependencies": {
     "babel-core": "^6.24.1",
     "babel-loader": "^7.0.0",
@@ -23,7 +27,9 @@
     "webpack": "^2.6.1"
   },
   "dependencies": {
+    "axios": "^0.16.2",
     "express": "^4.15.3",
+    "js-cookie": "^2.1.4",
     "prop-types": "^15.5.10",
     "react": "^15.5.4",
     "react-dom": "^15.5.4",
