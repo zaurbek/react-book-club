@@ -10,6 +10,11 @@ export default (state = {}, action) => {
                 user: {},
                 value: false
             }
+        case 'SERVER_DATA':
+            return {
+                user: action.payload,
+                value: true
+            }
         default:
             return state;
     }

@@ -32627,7 +32627,7 @@ module.exports = ReactPropTypesSecret;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.serverLogin = exports.SERVER_LOGIN = exports.USER_LOGOUT = exports.USER_DATA = undefined;
+exports.userSettings = exports.serverLogin = exports.SERVER_DATA = exports.USER_LOGOUT = exports.USER_DATA = undefined;
 exports.githubLogin = githubLogin;
 exports.githubLogout = githubLogout;
 
@@ -32670,8 +32670,9 @@ function githubLogin(token) {
 // /////////////LOGOUT/////////////////////
 var USER_LOGOUT = exports.USER_LOGOUT = 'USER_LOGOUT';
 
-function githubLogout() {
+function githubLogout(history) {
   _jsCookie2.default.remove('token');
+  history.push('/');
   return {
     type: USER_LOGOUT
   };
@@ -32679,10 +32680,17 @@ function githubLogout() {
 /////////////////SERVER LOGIN/////////////////////
 
 var serverFetch = function serverFetch(user) {
-  return _axios2.default.post('/api/server', user);
+  return _axios2.default.post('/api/server/user', user);
 };
 
-var SERVER_LOGIN = exports.SERVER_LOGIN = 'SERVER_LOGIN';
+var SERVER_DATA = exports.SERVER_DATA = 'SERVER_DATA';
+
+function serverPlace(userData) {
+  return {
+    type: SERVER_DATA,
+    payload: userData
+  };
+}
 
 var serverLogin = exports.serverLogin = function serverLogin(user) {
   return function (dispatch) {
@@ -32691,8 +32699,26 @@ var serverLogin = exports.serverLogin = function serverLogin(user) {
     }).then(function (data) {
       console.log(data);
       if (data.exist && user.name !== data.data.name && user.location !== data.data.location) {
-        return dispatch(githubPlace(data.data));
+        return dispatch(serverPlace(data.data));
       }
+    });
+  };
+};
+
+// ======================User Settings=============================
+
+var serverNewInfo = function serverNewInfo(object) {
+  return _axios2.default.post('/api/server/new', object);
+};
+
+var userSettings = exports.userSettings = function userSettings(object, history) {
+  return function (dispatch) {
+    serverNewInfo(object).then(function (res) {
+      return res.data;
+    }).then(function (data) {
+      console.log(data);
+      history.push('/');
+      return dispatch(serverPlace(data));
     });
   };
 };
@@ -70682,7 +70708,7 @@ var TopMenu = function (_Component) {
             _react2.default.createElement(
               _semanticUiReact.Button,
               { secondary: true, onClick: function onClick() {
-                  return _this2.props.githubLogout();
+                  return _this2.props.githubLogout(_this2.props.history);
                 } },
               'Logout'
             )
@@ -70823,8 +70849,8 @@ var Top = (0, _reactRedux.connect)(function (state) {
   };
 }, function (dispatch) {
   return {
-    githubLogout: function githubLogout() {
-      return dispatch((0, _actions.githubLogout)());
+    githubLogout: function githubLogout(history) {
+      return dispatch((0, _actions.githubLogout)(history));
     }
   };
 })(_TopMenu2.default);
@@ -70856,6 +70882,11 @@ exports.default = function () {
             return {
                 user: {},
                 value: false
+            };
+        case 'SERVER_DATA':
+            return {
+                user: action.payload,
+                value: true
             };
         default:
             return state;
@@ -70945,7 +70976,7 @@ exports = module.exports = __webpack_require__(541)(undefined);
 
 
 // module
-exports.push([module.i, ".profile_img {\n  height: auto;\n  margin-right: 15px !important;\n  border-radius: 2px; }\n\n.ui.menu {\n  margin-bottom: 0 !important;\n  border-radius: 0 !important; }\n\n.fa-book {\n  margin-right: 5px; }\n\n.jumbotron {\n  height: 45vh;\n  width: 100%;\n  background-color: #48d09b;\n  padding: 0;\n  margin: 0;\n  display: -webkit-box;\n  display: -moz-box;\n  display: -ms-flexbox;\n  display: -webkit-flex;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  color: #FFF8F8; }\n\n.jumbo-404 {\n  display: flex;\n  flex-direction: column;\n  width: 100%;\n  height: 100%;\n  overflow: hidden; }\n\n.jumbo-names {\n  display: flex;\n  flex-direction: column;\n  justify-content: center;\n  align-items: center;\n  flex-grow: 1; }\n  .jumbo-names h1 {\n    font-size: 60px; }\n  .jumbo-names h4 {\n    font-size: 21px; }\n\n.jumbo-404-names {\n  display: flex;\n  flex-direction: column;\n  justify-content: center;\n  align-items: center;\n  height: 500px; }\n  .jumbo-404-names h1 {\n    font-size: 60px; }\n  .jumbo-404-names h4 {\n    font-size: 21px; }\n\n.frontpage {\n  margin-top: 15px; }\n  .frontpage .features-list {\n    margin-bottom: 55px !important; }\n  .frontpage h4 {\n    font-weight: normal; }\n    .frontpage h4 a {\n      color: #555; }\n      .frontpage h4 ahover {\n        text-decoration: none; }\n\n.logo {\n  color: black; }\n  .logo :hover {\n    text-decoration: none; }\n", ""]);
+exports.push([module.i, ".profile_img {\n  height: auto;\n  margin-right: 15px !important;\n  border-radius: 2px; }\n\n.ui.menu {\n  margin-bottom: 0 !important;\n  border-radius: 0 !important; }\n\n.fa-book, .fa-paper-plane {\n  margin-right: 7px; }\n\n.jumbotron {\n  height: 45vh;\n  width: 100%;\n  background-color: #48d09b;\n  padding: 0;\n  margin: 0;\n  display: -webkit-box;\n  display: -moz-box;\n  display: -ms-flexbox;\n  display: -webkit-flex;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  color: #FFF8F8; }\n\n.jumbo-404 {\n  display: flex;\n  flex-direction: column;\n  width: 100%;\n  height: 100%;\n  overflow: hidden; }\n\n.jumbo-names {\n  display: flex;\n  flex-direction: column;\n  justify-content: center;\n  align-items: center;\n  flex-grow: 1; }\n  .jumbo-names h1 {\n    font-size: 60px; }\n  .jumbo-names h4 {\n    font-size: 21px; }\n\n.jumbo-404-names {\n  display: flex;\n  flex-direction: column;\n  justify-content: center;\n  align-items: center;\n  height: 500px; }\n  .jumbo-404-names h1 {\n    font-size: 60px; }\n  .jumbo-404-names h4 {\n    font-size: 21px; }\n\n.frontpage {\n  margin-top: 15px; }\n  .frontpage .features-list {\n    margin-bottom: 55px !important; }\n  .frontpage h4 {\n    font-weight: normal; }\n    .frontpage h4 a {\n      color: #555; }\n      .frontpage h4 ahover {\n        text-decoration: none; }\n\n.logo {\n  color: black; }\n  .logo :hover {\n    text-decoration: none; }\n", ""]);
 
 // exports
 
@@ -71380,6 +71411,8 @@ var _Profile = __webpack_require__(970);
 
 var _Profile2 = _interopRequireDefault(_Profile);
 
+var _actions = __webpack_require__(463);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var ProfilePage = (0, _reactRedux.connect)(function (state) {
@@ -71387,7 +71420,13 @@ var ProfilePage = (0, _reactRedux.connect)(function (state) {
     auth: state.auth.value,
     user: state.auth.user
   };
-}, null)(_Profile2.default);
+}, function (dispatch) {
+  return {
+    userSettings: function userSettings(object, history) {
+      return dispatch((0, _actions.userSettings)(object, history));
+    }
+  };
+})(_Profile2.default);
 
 exports.default = ProfilePage;
 
@@ -71430,13 +71469,33 @@ var Profile = function (_Component) {
   }
 
   _createClass(Profile, [{
+    key: 'submitForm',
+    value: function submitForm() {
+
+      var parsedObject = {
+        id: this.props.user.id,
+        name: this.InputName.value ? this.InputName.value : this.props.user.name,
+        location: this.InputLocation.value ? this.InputLocation.value : this.props.user.location
+      };
+      if (this.InputName.value || this.InputLocation.value) {
+        this.props.userSettings(parsedObject, this.props.history);
+      }
+    }
+  }, {
     key: 'render',
     value: function render() {
+      var _this2 = this;
+
       if (this.props.auth) {
         return _react2.default.createElement(
           _semanticUiReact.Container,
           { text: true, className: 'frontpage' },
           _react2.default.createElement(_semanticUiReact.Image, { shape: 'rounded', centered: true, size: 'small', src: this.props.user.avatar_url }),
+          _react2.default.createElement(
+            'h2',
+            null,
+            'Change my personal information:'
+          ),
           _react2.default.createElement(
             _semanticUiReact.Form,
             null,
@@ -71446,9 +71505,13 @@ var Profile = function (_Component) {
               _react2.default.createElement(
                 'label',
                 null,
-                'Full Name'
+                'Full Name:'
               ),
-              _react2.default.createElement('input', { placeholder: this.props.user.name + '...' })
+              _react2.default.createElement('input', {
+                ref: function ref(input) {
+                  return _this2.InputName = input;
+                },
+                placeholder: this.props.user.name + '...' })
             ),
             _react2.default.createElement(
               _semanticUiReact.Form.Field,
@@ -71458,11 +71521,18 @@ var Profile = function (_Component) {
                 null,
                 'Location:'
               ),
-              _react2.default.createElement('input', { placeholder: this.props.user.location + '...' })
+              _react2.default.createElement('input', {
+                ref: function ref(input) {
+                  return _this2.InputLocation = input;
+                },
+                placeholder: this.props.user.location + '...' })
             ),
             _react2.default.createElement(
               _semanticUiReact.Button,
-              { type: 'submit' },
+              { type: 'button', primary: true, onClick: function onClick() {
+                  return _this2.submitForm();
+                } },
+              _react2.default.createElement('i', { className: 'fa fa-paper-plane', 'aria-hidden': 'true' }),
               'Submit'
             )
           )

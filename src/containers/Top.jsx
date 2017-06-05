@@ -9,7 +9,7 @@ const Top = connect(
     auth: state.auth.value,
     user: state.auth.user
   }),dispatch=>({
-    githubLogout: ()=>dispatch(githubLogout())
+    githubLogout: (history)=>dispatch(githubLogout(history))
   })
 )(TopMenu);
 

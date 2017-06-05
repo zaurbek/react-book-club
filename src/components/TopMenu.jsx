@@ -14,7 +14,7 @@ class TopMenu extends Component {
         : null}
       {this.props.auth
         ? <Menu.Item>
-            <Button secondary onClick={() => this.props.githubLogout()}>Logout</Button>
+            <Button secondary onClick={() => this.props.githubLogout(this.props.history)}>Logout</Button>
           </Menu.Item>
         : <Menu.Item>
           <a

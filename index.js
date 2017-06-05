@@ -21,8 +21,45 @@ app.use('/', express.static(`${__dirname}/public`));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
+app.post('/api/server/new',(req,res)=>{
+  const newUserData = {
+    id: req.body.id,
+    name: req.body.name,
+    location: req.body.location
+  }
 
-app.post('/api/server', (req, res) => {
+  MongoClient.connect(config.mlab, (err, db) => {
+    if (err) {
+      console.log(err);
+    } else {
+      console.log(`connection established with: ${config.mlab}`);
+
+      const users = db.collection('users');
+
+      const MongoAccess = (db, callback) => {
+          users.findOneAndUpdate({'id':newUserData.id},{$set: {name: newUserData.name, location: newUserData.location}}).then(singleNode=>{
+            console.log('====================================');
+            console.log(newUserData);
+            console.log('====================================');
+            newUserData.avatar_url=singleNode.value.avatar_url;
+            if (singleNode) {
+              return res.send(newUserData);
+            }
+          })
+
+      };
+
+      MongoAccess(db, () => {
+        db.close();
+      });
+    }
+  });
+
+
+
+})
+
+app.post('/api/server/user', (req, res) => {
   const newUser = {
     id: req.body.id,
     name: req.body.name,
