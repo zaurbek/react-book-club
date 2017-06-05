@@ -2,7 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import App from '../components/App.jsx';
 
-import { githubLogin, githubLogout, searchLocation, Loader } from '../actions';
+import { githubLogin, githubLogout, serverLogin, Loader } from '../actions';
 
 
 const Root = connect(
@@ -12,7 +12,9 @@ const Root = connect(
   }),
   dispatch => ({
     githubLogin: token => dispatch(githubLogin(token)),
-    githubLogout: () => dispatch(githubLogout())
+    githubLogout: () => dispatch(githubLogout()),
+    serverLogin: (user)=>dispatch(serverLogin(user)),
   }))(App);
 
 export default Root;
+

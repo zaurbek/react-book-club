@@ -16,12 +16,12 @@ class App extends Component {
     const token = Cookies.get('token');
     if (token && !this.props.auth) {
         this.props.githubLogin(token);
-      }
+    }
+    
   }
   componentDidUpdate() {
-    const token = Cookies.get('token');
-    if (token && !this.props.auth) {
-        this.props.githubLogin(token);
+    if (this.props.user.name) {
+        this.props.serverLogin(this.props.user);
     }
   }
   render() {
@@ -46,6 +46,7 @@ class App extends Component {
 App.propTypes = {
   auth: PropTypes.bool.isRequired,
   githubLogin: PropTypes.func.isRequired,
+  serverLogin: PropTypes.func.isRequired,
 };
 
 export default App;

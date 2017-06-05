@@ -32627,7 +32627,7 @@ module.exports = ReactPropTypesSecret;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.USER_LOGOUT = exports.USER_DATA = undefined;
+exports.serverLogin = exports.SERVER_LOGIN = exports.USER_LOGOUT = exports.USER_DATA = undefined;
 exports.githubLogin = githubLogin;
 exports.githubLogout = githubLogout;
 
@@ -32671,12 +32671,31 @@ function githubLogin(token) {
 var USER_LOGOUT = exports.USER_LOGOUT = 'USER_LOGOUT';
 
 function githubLogout() {
-  _jsCookie2.default.remove('token', function () {});
-
+  _jsCookie2.default.remove('token');
   return {
     type: USER_LOGOUT
   };
 }
+/////////////////SERVER LOGIN/////////////////////
+
+var serverFetch = function serverFetch(user) {
+  return _axios2.default.post('/api/server', user);
+};
+
+var SERVER_LOGIN = exports.SERVER_LOGIN = 'SERVER_LOGIN';
+
+var serverLogin = exports.serverLogin = function serverLogin(user) {
+  return function (dispatch) {
+    serverFetch(user).then(function (res) {
+      return res.data;
+    }).then(function (data) {
+      console.log(data);
+      if (data.exist && user.name !== data.data.name && user.location !== data.data.location) {
+        return dispatch(githubPlace(data.data));
+      }
+    });
+  };
+};
 
 /***/ }),
 /* 464 */
@@ -70406,9 +70425,8 @@ var App = function (_Component) {
   }, {
     key: 'componentDidUpdate',
     value: function componentDidUpdate() {
-      var token = _jsCookie2.default.get('token');
-      if (token && !this.props.auth) {
-        this.props.githubLogin(token);
+      if (this.props.user.name) {
+        this.props.serverLogin(this.props.user);
       }
     }
   }, {
@@ -70442,7 +70460,8 @@ var App = function (_Component) {
 
 App.propTypes = {
   auth: _propTypes2.default.bool.isRequired,
-  githubLogin: _propTypes2.default.func.isRequired
+  githubLogin: _propTypes2.default.func.isRequired,
+  serverLogin: _propTypes2.default.func.isRequired
 };
 
 exports.default = App;
@@ -70477,7 +70496,7 @@ var FrontPage = function FrontPage(_ref) {
     return _react2.default.createElement(
         'div',
         null,
-        auth ? _react2.default.createElement(_reactRouterDom.Redirect, { to: '/dashboard' }) : _react2.default.createElement(
+        auth ? _react2.default.createElement(_reactRouterDom.Redirect, { to: '/all' }) : _react2.default.createElement(
             'div',
             null,
             _react2.default.createElement(
@@ -70763,6 +70782,9 @@ var Root = (0, _reactRedux.connect)(function (state) {
     },
     githubLogout: function githubLogout() {
       return dispatch((0, _actions.githubLogout)());
+    },
+    serverLogin: function serverLogin(user) {
+      return dispatch((0, _actions.serverLogin)(user));
     }
   };
 })(_App2.default);
@@ -71343,6 +71365,117 @@ exports.default = Page404;
 
 "use strict";
 
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _react = __webpack_require__(1);
+
+var _react2 = _interopRequireDefault(_react);
+
+var _reactRedux = __webpack_require__(136);
+
+var _Profile = __webpack_require__(970);
+
+var _Profile2 = _interopRequireDefault(_Profile);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var ProfilePage = (0, _reactRedux.connect)(function (state) {
+  return {
+    auth: state.auth.value,
+    user: state.auth.user
+  };
+}, null)(_Profile2.default);
+
+exports.default = ProfilePage;
+
+/***/ }),
+/* 970 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _react = __webpack_require__(1);
+
+var _react2 = _interopRequireDefault(_react);
+
+var _reactRouterDom = __webpack_require__(841);
+
+var _semanticUiReact = __webpack_require__(418);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var Profile = function (_Component) {
+  _inherits(Profile, _Component);
+
+  function Profile(props) {
+    _classCallCheck(this, Profile);
+
+    return _possibleConstructorReturn(this, (Profile.__proto__ || Object.getPrototypeOf(Profile)).call(this, props));
+  }
+
+  _createClass(Profile, [{
+    key: 'render',
+    value: function render() {
+      if (this.props.auth) {
+        return _react2.default.createElement(
+          _semanticUiReact.Container,
+          { text: true, className: 'frontpage' },
+          _react2.default.createElement(_semanticUiReact.Image, { shape: 'rounded', centered: true, size: 'small', src: this.props.user.avatar_url }),
+          _react2.default.createElement(
+            _semanticUiReact.Form,
+            null,
+            _react2.default.createElement(
+              _semanticUiReact.Form.Field,
+              null,
+              _react2.default.createElement(
+                'label',
+                null,
+                'Full Name'
+              ),
+              _react2.default.createElement('input', { placeholder: this.props.user.name + '...' })
+            ),
+            _react2.default.createElement(
+              _semanticUiReact.Form.Field,
+              null,
+              _react2.default.createElement(
+                'label',
+                null,
+                'Location:'
+              ),
+              _react2.default.createElement('input', { placeholder: this.props.user.location + '...' })
+            ),
+            _react2.default.createElement(
+              _semanticUiReact.Button,
+              { type: 'submit' },
+              'Submit'
+            )
+          )
+        );
+      }
+      return _react2.default.createElement(_reactRouterDom.Redirect, { to: '/' });
+    }
+  }]);
+
+  return Profile;
+}(_react.Component);
+
+exports.default = Profile;
 
 /***/ })
 /******/ ]);

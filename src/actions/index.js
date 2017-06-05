@@ -29,11 +29,35 @@ export function githubLogin(token) {
 export const USER_LOGOUT = 'USER_LOGOUT';
 
 export function githubLogout() {
-  Cookies.remove('token',()=>{
-    
-  });
-
+  Cookies.remove('token');
   return {
     type: USER_LOGOUT,
   };
+
+  
 }
+/////////////////SERVER LOGIN/////////////////////
+
+const serverFetch = (user) => {
+  return axios.post('/api/server',user);
+}
+
+
+
+
+
+
+export const SERVER_LOGIN = 'SERVER_LOGIN';
+
+
+export const serverLogin = (user) => {
+  return dispatch =>{
+    serverFetch(user).then(res =>res.data).then((data)=>{
+      console.log(data);
+      if (data.exist&&(user.name!==data.data.name)&&(user.location!==data.data.location)) {
+        return dispatch(githubPlace(data.data));
+      }
+    })
+  }
+  
+};

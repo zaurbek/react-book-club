@@ -6,7 +6,7 @@ import { Redirect } from 'react-router-dom'
 
 const FrontPage = ({auth}) => (
   <div>
-  {auth?<Redirect to="/dashboard"/>:<div><div className='jumbotron'>
+  {auth?<Redirect to="/all"/>:<div><div className='jumbotron'>
                     <div className='jumbo-names'>
                         <h1><i className="fa fa-book" aria-hidden="true"/>
                             React Book Club</h1>
