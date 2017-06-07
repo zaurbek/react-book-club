@@ -9,6 +9,14 @@ class TopMenu extends Component {
       <Menu >
     <Menu.Item><Link to='/' className='logo'><i className="fa fa-book" aria-hidden="true"/> React-Book-Club</Link></Menu.Item>
     <Menu.Menu position="right">
+      {this.props.auth ? <Menu.Item>
+            <Link to='/all'>All books</Link>
+          </Menu.Item>
+          :null}
+      {this.props.auth ? <Menu.Item>
+            <Link to='/my'>My books</Link>
+          </Menu.Item>
+          :null}
       {this.props.auth
         ? <Menu.Item><img className="profile_img" src={this.props.user.avatar_url}/><Link to='/profile'>{this.props.user.name}</Link></Menu.Item>
         : null}

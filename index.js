@@ -6,6 +6,10 @@ const queryString = require('query-string');
 const bodyParser = require('body-parser');
 
 
+var google = require('googleapis');
+var books = google.books('v1');
+
+
 const config = require('./config.js');
 
 const PORT = process.env.PORT || 8080;
@@ -20,6 +24,42 @@ const User = require('./models/user');
 app.use('/', express.static(`${__dirname}/public`));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
+
+
+app.post('/api/books/add',(req,res)=>{
+  const bookName = req.body.bookName;
+
+  books.volumes.list({q: bookName}, (err,gooogleRespond)=>{
+  if (err) console.log(err);
+  if (gooogleRespond.items.length > 0) {
+
+    const neededBook = {
+      image: gooogleRespond.items[0].volumeInfo.imageLinks.thumbnail,
+      name: gooogleRespond.items[0].volumeInfo.title,
+      owner: req.body.id,
+      requested: {
+        value: false,
+        by: ''
+      }
+    }
+
+    console.log('====================================');
+    console.log(neededBook);
+    console.log('====================================');
+    res.send('lool');
+  } else {
+
+    res.json({'error':'No results'});
+
+  }
+  
+ })
+
+})
+
+
+
+
 
 app.post('/api/server/new',(req,res)=>{
   const newUserData = {
