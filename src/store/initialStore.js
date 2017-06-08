@@ -2,6 +2,9 @@ let initialStore ={
    auth: {
       value: false,
       user: {}
+    },
+    book: {
+      items: []
     }
 }
 

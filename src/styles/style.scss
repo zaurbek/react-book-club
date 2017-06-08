@@ -1,65 +1,108 @@
 .profile_img {
-    height: auto;
-    margin-right: 15px !important;
-    border-radius:2px;
+  height: auto;
+  margin-right: 15px !important;
+  border-radius: 2px;
 }
+
 .ui.menu {
   margin-bottom: 0 !important;
   border-radius: 0 !important;
 }
-.fa-book, .fa-paper-plane{
-    margin-right: 7px;
+
+.fa-book,
+.fa-paper-plane {
+  margin-right: 7px;
+}
+
+.my-books {
+  margin: 20px;
+}
+
+.book-card {
+  -webkit-box-shadow: 0px 11px 21px -4px rgba(0, 0, 0, 0.75);
+  -moz-box-shadow: 0px 11px 21px -4px rgba(0, 0, 0, 0.75);
+  box-shadow: 0px 11px 21px -4px rgba(0, 0, 0, 0.75);
+  height: 220px !important;
+  margin-bottom: 30px;
+}
+
+.book-cover {
+  margin: 15px;
+  height: 220px;
+  width: 150px;
+  float: left;
+  position: relative;
+  overflow: hidden;
+  &:hover .overlay {
+    opacity: 0.3;
+  }
+}
+
+.overlay {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 100%;
+  width: 100%;
+  opacity: 0;
+  transition: .2s ease;
+  background-color: #ED4337;
 }
 
 .jumbotron {
   height: 45vh;
   width: 100%;
   background-color: #48d09b;
-    padding: 0;
-    margin: 0;
-    display: -webkit-box;
-    display: -moz-box;
-    display: -ms-flexbox;
-    display: -webkit-flex;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #FFF8F8;
+  padding: 0;
+  margin: 0;
+  display: -webkit-box;
+  display: -moz-box;
+  display: -ms-flexbox;
+  display: -webkit-flex;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #FFF8F8;
 }
+
 .jumbo-404 {
   display: flex;
   flex-direction: column;
   width: 100%;
-  height:100%; 
-    overflow:hidden;
+  height: 100%;
+  overflow: hidden;
 }
+
 .jumbo-names {
   display: flex;
-  flex-direction: column;  
-    justify-content: center; 
-    align-items: center;     
-    flex-grow: 1;
-    h1 {
-      font-size: 60px;
-    }
-    h4 {
-      font-size: 21px;
-    }
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  flex-grow: 1;
+  h1 {
+    font-size: 60px;
+  }
+  h4 {
+    font-size: 21px;
+  }
 }
 
 .jumbo-404-names {
   display: flex;
-  flex-direction: column;  
-    justify-content: center; 
-    align-items: center;
-    height: 500px;     
-    h1 {
-      font-size: 60px;
-    }
-    h4 {
-      font-size: 21px;
-    }
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 500px;
+  h1 {
+    font-size: 60px;
+  }
+  h4 {
+    font-size: 21px;
+  }
 }
+
 .frontpage {
   margin-top: 15px;
   .features-list {
@@ -78,7 +121,7 @@
 
 .logo {
   color: black;
-  :hover {
+   :hover {
     text-decoration: none;
   }
 }

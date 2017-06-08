@@ -17,6 +17,7 @@ class App extends Component {
     const token = Cookies.get('token');
     if (token && !this.props.auth) {
         this.props.githubLogin(token);
+        this.props.fetchBooks();
     }
     
   }
@@ -49,6 +50,7 @@ App.propTypes = {
   auth: PropTypes.bool.isRequired,
   githubLogin: PropTypes.func.isRequired,
   serverLogin: PropTypes.func.isRequired,
+  fetchBooks: PropTypes.func.isRequired,
 };
 
 export default App;

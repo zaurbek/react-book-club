@@ -30,7 +30,7 @@ class MyBooks extends Component {
           <div style={{ clear: 'both', marginBottom: '25px' }} />
           {this.props.books.map((item) => {
             if (item.owner==this.props.userID) {
-             return <div key={item._id} className='book-cover'><Image className='book-card' src={item.image} alt={item.name} size='small' /><div onClick={()=>this.props.deleteBook(item._id)}className='overlay'/></div>
+             return <div key={item._id} className='book-cover'><Image className='book-card' src={item.image} alt={item.name} size='small' /><div className='overlay'/></div>
             }
             })}
         </Container>
@@ -46,9 +46,7 @@ MyBooks.propTypes = {
   auth: PropTypes.bool.isRequired,
   userID: PropTypes.number,
   id: PropTypes.number,
-  books: PropTypes.array,
-  searchBook: PropTypes.func.isRequired,
-  deleteBook: PropTypes.func.isRequired,
+  books: PropTypes.array
 };
 
 export default MyBooks;
