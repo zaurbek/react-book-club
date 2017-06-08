@@ -28,7 +28,7 @@ const FrontPage = ({auth}) => (
                         </List.Item>
                         <List.Item>
                             <List.Content>
-                                <List.Header><strike>Update settings to store full name, city, and state</strike></List.Header>
+                                <List.Header>Update settings to store full name, city, and state</List.Header>
                             </List.Content>
                         </List.Item>
                         <List.Item>

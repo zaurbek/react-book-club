@@ -119,4 +119,60 @@ export const deleteBook = id => (dispatch) => {
   });
 };
 
-// ===================           ============================
+// ===================  TRADE         ============================
+export const TRADE_BOOK = 'TRADE_BOOK';
+
+const tryBook = (book,user) => ({
+  type: TRADE_BOOK,
+  payload: {
+    book,
+    user,
+  }
+});
+
+export const tradeBook = (book, user) => dispatch => {
+  dispatch(tryBook(book,user));
+  axios.post('/api/books/trade/request',{book,user}).then(res=>res.data).then((data)=>{
+    console.log(data);
+    return dispatch(serverBooks(data));
+  })
+}
+
+/////////////////////// confirm Trade/////////////////////////////
+export const TRY_CONFIRM = 'TRY_CONFIRM';
+
+const tryConfirm = (id) => ({
+  type: TRY_CONFIRM,
+  payload: id
+});
+
+export const confirmTrade = (newOwner, id) => dispatch => {
+  dispatch(tryConfirm(id));
+  axios.post('/api/books/trade/confirm',{newOwner, id}).then(res=>res.data).then((data)=>{
+    console.log(data);
+    return dispatch(serverBooks(data));
+  })
+}
+// ========================deny Trade===========================
+export const TRY_DENY = 'TRY_DENY';
+
+const tryDeny = (id) => ({
+  type: TRY_DENY,
+  payload: id
+});
+
+export const denyTrade = (id) => dispatch => {
+  dispatch(tryDeny(id));
+  axios.post('/api/books/trade/deny',{id}).then(res=>res.data).then((data)=>{
+    console.log(data);
+    return dispatch(serverBooks(data));
+  })
+}
+
+
+
+
+
+
+
+

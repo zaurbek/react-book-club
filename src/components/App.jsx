@@ -8,6 +8,8 @@ import TopMenu from '../containers/Top.jsx';
 import ProfilePage from '../containers/Profile.jsx';
 import Page404 from './UnknownPage.jsx';
 import MyBooksPage from '../containers/MyBooksPage.jsx';
+import AllBooksPage from '../containers/AllBooksPage.jsx';
+
 
 class App extends Component {
   constructor(props) {
@@ -36,6 +38,7 @@ class App extends Component {
             <Switch>
             <Route exact path="/" component={FrontPage} />
             <Route path="/profile" component={ProfilePage} />
+            <Route path="/all" component={AllBooksPage}/>
             <Route path="/my" component={MyBooksPage}/>
             <Route component={Page404}/> 
             </Switch>

@@ -8,6 +8,7 @@ class TopMenu extends Component {
     return (
       <Menu >
     <Menu.Item><Link to='/' className='logo'><i className="fa fa-book" aria-hidden="true"/> React-Book-Club</Link></Menu.Item>
+    <Menu.Item><a href='https://github.com/zzhakupov/react-book-club' target="_blank">Source on <i className="fa fa-github" aria-hidden="true"/> Github</a></Menu.Item>
     <Menu.Menu position="right">
       {this.props.auth ? <Menu.Item>
             <Link to='/all'>All books</Link>

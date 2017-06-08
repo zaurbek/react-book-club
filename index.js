@@ -20,6 +20,77 @@ app.use('/', express.static(`${__dirname}/public`));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
+app.post('/api/books/trade/confirm',(req,res)=>{
+  MongoClient.connect(config.mlab, (err, db) => {
+    if (err) {
+      console.log(err);
+    } else {
+      console.log(`connection established with: ${config.mlab}`);
+
+      const Bookies = db.collection('books');
+
+      const MongoAccess = (db, callback) => {
+        Bookies.findOneAndUpdate({ "_id": mongodb.ObjectId(req.body.id) },{ $set: { owner: req.body.newOwner, requested: { value: false, by: '' } } });
+        Bookies.find().toArray().then((respond) => {
+          console.log( typeof respond);
+          res.json(respond);
+        });
+      };
+
+      MongoAccess(db, () => {
+        db.close();
+      });
+    }
+  });
+})
+
+app.post('/api/books/trade/deny',(req,res)=>{
+  MongoClient.connect(config.mlab, (err, db) => {
+    if (err) {
+      console.log(err);
+    } else {
+      console.log(`connection established with: ${config.mlab}`);
+
+      const Bookies = db.collection('books');
+
+      const MongoAccess = (db, callback) => {
+        Bookies.findOneAndUpdate({ "_id": mongodb.ObjectId(req.body.id) },{ $set: { requested: { value: false, by: '' } } });
+        Bookies.find().toArray().then((respond) => {
+          console.log( typeof respond);
+          res.json(respond);
+        });
+      };
+
+      MongoAccess(db, () => {
+        db.close();
+      });
+    }
+  });
+})
+app.post('/api/books/trade/request',(req,res)=>{
+  MongoClient.connect(config.mlab, (err, db) => {
+    if (err) {
+      console.log(err);
+    } else {
+      console.log(`connection established with: ${config.mlab}`);
+
+      const Bookies = db.collection('books');
+
+      const MongoAccess = (db, callback) => {
+        Bookies.findOneAndUpdate({ "_id": mongodb.ObjectId(req.body.book) },{ $set: { requested: { value: true, by: req.body.user } } });
+        Bookies.find().toArray().then((respond) => {
+          console.log( typeof respond);
+          res.json(respond);
+        });
+      };
+
+      MongoAccess(db, () => {
+        db.close();
+      });
+    }
+  });
+})
+
 
 app.post('/api/books/delete', (req, res) => {
   MongoClient.connect(config.mlab, (err, db) => {
@@ -81,7 +152,7 @@ app.post('/api/books/add', (req, res) => {
       if (gooogleRespond.items.length > 0) {
         const neededBook = {
           _id: mongodb.ObjectId(),
-          image: gooogleRespond.items[0].volumeInfo.imageLinks.thumbnail?gooogleRespond.items[0].volumeInfo.imageLinks.thumbnail:'',
+          image: gooogleRespond.items[0].volumeInfo.imageLinks?gooogleRespond.items[0].volumeInfo.imageLinks.thumbnail:'',
           name: gooogleRespond.items[0].volumeInfo.title,
           owner: req.body.id,
           requested: {
@@ -203,7 +274,7 @@ app.post('/api/server/user', (req, res) => {
 
 app.get('/redirect/github/auth', (req, res) => {
   res.redirect('http://github.com/login/oauth/authorize?client_id=86aff9e326ea4271199d&redirect_' +
-      'uri=http%3A%2F%2F127.0.0.1%3A8080%2Fauth%2Fgithub&scope=user');
+      'uri=https%3A%2F%2Freact-book-club.herokuapp.com%2Fauth%2Fgithub&scope=user');
 });
 
 app.get('/auth/github', (req, res) => {

@@ -10657,7 +10657,7 @@ module.exports = function (module) {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.deleteBook = exports.TRY_DELETE = exports.fetchBooks = exports.BOOKS_FETCH = exports.searchBook = exports.BOOKS_DATA = exports.userSettings = exports.serverLogin = exports.SERVER_DATA = exports.USER_LOGOUT = exports.USER_DATA = undefined;
+exports.denyTrade = exports.TRY_DENY = exports.confirmTrade = exports.TRY_CONFIRM = exports.tradeBook = exports.TRADE_BOOK = exports.deleteBook = exports.TRY_DELETE = exports.fetchBooks = exports.BOOKS_FETCH = exports.searchBook = exports.BOOKS_DATA = exports.userSettings = exports.serverLogin = exports.SERVER_DATA = exports.USER_LOGOUT = exports.USER_DATA = undefined;
 exports.githubLogin = githubLogin;
 exports.githubLogout = githubLogout;
 
@@ -10819,7 +10819,73 @@ var deleteBook = exports.deleteBook = function deleteBook(id) {
   };
 };
 
-// ===================           ============================
+// ===================  TRADE         ============================
+var TRADE_BOOK = exports.TRADE_BOOK = 'TRADE_BOOK';
+
+var tryBook = function tryBook(book, user) {
+  return {
+    type: TRADE_BOOK,
+    payload: {
+      book: book,
+      user: user
+    }
+  };
+};
+
+var tradeBook = exports.tradeBook = function tradeBook(book, user) {
+  return function (dispatch) {
+    dispatch(tryBook(book, user));
+    _axios2.default.post('/api/books/trade/request', { book: book, user: user }).then(function (res) {
+      return res.data;
+    }).then(function (data) {
+      console.log(data);
+      return dispatch(serverBooks(data));
+    });
+  };
+};
+
+/////////////////////// confirm Trade/////////////////////////////
+var TRY_CONFIRM = exports.TRY_CONFIRM = 'TRY_CONFIRM';
+
+var tryConfirm = function tryConfirm(id) {
+  return {
+    type: TRY_CONFIRM,
+    payload: id
+  };
+};
+
+var confirmTrade = exports.confirmTrade = function confirmTrade(newOwner, id) {
+  return function (dispatch) {
+    dispatch(tryConfirm(id));
+    _axios2.default.post('/api/books/trade/confirm', { newOwner: newOwner, id: id }).then(function (res) {
+      return res.data;
+    }).then(function (data) {
+      console.log(data);
+      return dispatch(serverBooks(data));
+    });
+  };
+};
+// ========================deny Trade===========================
+var TRY_DENY = exports.TRY_DENY = 'TRY_DENY';
+
+var tryDeny = function tryDeny(id) {
+  return {
+    type: TRY_DENY,
+    payload: id
+  };
+};
+
+var denyTrade = exports.denyTrade = function denyTrade(id) {
+  return function (dispatch) {
+    dispatch(tryDeny(id));
+    _axios2.default.post('/api/books/trade/deny', { id: id }).then(function (res) {
+      return res.data;
+    }).then(function (data) {
+      console.log(data);
+      return dispatch(serverBooks(data));
+    });
+  };
+};
 
 /***/ }),
 /* 151 */
@@ -70495,6 +70561,10 @@ var _MyBooksPage = __webpack_require__(962);
 
 var _MyBooksPage2 = _interopRequireDefault(_MyBooksPage);
 
+var _AllBooksPage = __webpack_require__(975);
+
+var _AllBooksPage2 = _interopRequireDefault(_AllBooksPage);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -70546,6 +70616,7 @@ var App = function (_Component) {
               null,
               _react2.default.createElement(_reactRouterDom.Route, { exact: true, path: '/', component: _Front2.default }),
               _react2.default.createElement(_reactRouterDom.Route, { path: '/profile', component: _Profile2.default }),
+              _react2.default.createElement(_reactRouterDom.Route, { path: '/all', component: _AllBooksPage2.default }),
               _react2.default.createElement(_reactRouterDom.Route, { path: '/my', component: _MyBooksPage2.default }),
               _react2.default.createElement(_reactRouterDom.Route, { component: _UnknownPage2.default })
             )
@@ -70665,11 +70736,7 @@ var FrontPage = function FrontPage(_ref) {
                             _react2.default.createElement(
                                 _semanticUiReact.List.Header,
                                 null,
-                                _react2.default.createElement(
-                                    'strike',
-                                    null,
-                                    'Update settings to store full name, city, and state'
-                                )
+                                'Update settings to store full name, city, and state'
                             )
                         )
                     ),
@@ -70773,6 +70840,66 @@ var MyBooks = function (_Component) {
             _semanticUiReact.Container,
             { className: 'my-books' },
             _react2.default.createElement(
+              Grid,
+              { divided: 'vertically' },
+              _react2.default.createElement(
+                Grid.Row,
+                { columns: 2 },
+                _react2.default.createElement(
+                  Grid.Column,
+                  null,
+                  _react2.default.createElement(
+                    Segment,
+                    { color: 'yellow' },
+                    'Requested books (',
+                    RequestedBy,
+                    '):'
+                  ),
+                  showRequestedBy ? _react2.default.createElement(
+                    Segment.Group,
+                    null,
+                    this.props.books.map(function (item) {
+                      if (item.requested.by == _this2.props.id && item.requested.value) {
+                        return _react2.default.createElement(
+                          Segment,
+                          { onClick: function onClick() {
+                              return _this2.props.denyTrade(item._id);
+                            }, className: 'by-list', key: item._id },
+                          item.name
+                        );
+                      }
+                    })
+                  ) : null
+                ),
+                _react2.default.createElement(
+                  Grid.Column,
+                  null,
+                  _react2.default.createElement(
+                    Segment,
+                    { color: 'violet' },
+                    'Books requested from you (',
+                    RequestedFrom,
+                    '):'
+                  ),
+                  showRequestedFrom ? _react2.default.createElement(
+                    Segment.Group,
+                    null,
+                    this.props.books.map(function (item) {
+                      if (item.owner == _this2.props.id && item.requested.value) {
+                        return _react2.default.createElement(
+                          Segment,
+                          { onClick: function onClick() {
+                              return _this2.props.confirmTrade(_this2.props.id, item._id);
+                            }, className: 'from-list', key: item._id },
+                          item.name
+                        );
+                      }
+                    })
+                  ) : null
+                )
+              )
+            ),
+            _react2.default.createElement(
               'div',
               { className: 'ui input' },
               _react2.default.createElement('input', { type: 'text', ref: function ref(input) {
@@ -70783,19 +70910,23 @@ var MyBooks = function (_Component) {
                 { secondary: true, onClick: function onClick() {
                     return _this2.searchBook();
                   } },
-                'Search for a Book'
+                'Add a Book'
               )
             ),
             _react2.default.createElement('div', { style: { clear: 'both', marginBottom: '25px' } }),
             this.props.books.map(function (item) {
-              if (item.owner == _this2.props.userID) {
+              if (item.owner == _this2.props.id) {
                 return _react2.default.createElement(
                   'div',
                   { key: item._id, className: 'book-cover' },
                   _react2.default.createElement(_semanticUiReact.Image, { className: 'book-card', src: item.image, alt: item.name, size: 'small' }),
-                  _react2.default.createElement('div', { onClick: function onClick() {
-                      return _this2.props.deleteBook(item._id);
-                    }, className: 'overlay' })
+                  _react2.default.createElement(
+                    'div',
+                    { onClick: function onClick() {
+                        return _this2.props.deleteBook(item._id);
+                      }, className: 'overlay' },
+                    _react2.default.createElement('i', { className: 'fa fa-times', 'aria-hidden': 'true' })
+                  )
                 );
               }
             })
@@ -70811,9 +70942,10 @@ var MyBooks = function (_Component) {
 
 MyBooks.propTypes = {
   auth: _propTypes2.default.bool.isRequired,
-  userID: _propTypes2.default.number,
   id: _propTypes2.default.number,
   books: _propTypes2.default.array,
+  denyTrade: _propTypes2.default.func.isRequired,
+  confirmTrade: _propTypes2.default.func.isRequired,
   searchBook: _propTypes2.default.func.isRequired,
   deleteBook: _propTypes2.default.func.isRequired
 };
@@ -70998,6 +71130,17 @@ var TopMenu = function (_Component) {
           )
         ),
         _react2.default.createElement(
+          _semanticUiReact.Menu.Item,
+          null,
+          _react2.default.createElement(
+            'a',
+            { href: 'https://github.com/zzhakupov/react-book-club', target: '_blank' },
+            'Source on ',
+            _react2.default.createElement('i', { className: 'fa fa-github', 'aria-hidden': 'true' }),
+            ' Github'
+          )
+        ),
+        _react2.default.createElement(
           _semanticUiReact.Menu.Menu,
           { position: 'right' },
           this.props.auth ? _react2.default.createElement(
@@ -71179,8 +71322,7 @@ var MyBooksPage = (0, _reactRedux.connect)(function (state) {
   return {
     auth: state.auth.value,
     id: state.auth.user.id,
-    books: state.book.items,
-    userID: state.auth.user.id
+    books: state.book.items
   };
 }, function (dispatch) {
   return {
@@ -71189,6 +71331,12 @@ var MyBooksPage = (0, _reactRedux.connect)(function (state) {
     },
     deleteBook: function deleteBook(id) {
       return dispatch((0, _actions.deleteBook)(id));
+    },
+    confirmTrade: function confirmTrade(newOwner, id) {
+      return dispatch((0, _actions.confirmTrade)(newOwner, id));
+    },
+    denyTrade: function denyTrade(id) {
+      return dispatch((0, _actions.denyTrade)(id));
     }
   };
 })(_MyBooksPage2.default);
@@ -71452,7 +71600,7 @@ exports = module.exports = __webpack_require__(542)(undefined);
 
 
 // module
-exports.push([module.i, ".profile_img {\n  height: auto;\n  margin-right: 15px !important;\n  border-radius: 2px; }\n\n.ui.menu {\n  margin-bottom: 0 !important;\n  border-radius: 0 !important; }\n\n.fa-book,\n.fa-paper-plane {\n  margin-right: 7px; }\n\n.my-books {\n  margin: 20px; }\n\n.book-card {\n  -webkit-box-shadow: 0px 11px 21px -4px rgba(0, 0, 0, 0.75);\n  -moz-box-shadow: 0px 11px 21px -4px rgba(0, 0, 0, 0.75);\n  box-shadow: 0px 11px 21px -4px rgba(0, 0, 0, 0.75);\n  height: 220px !important;\n  margin-bottom: 30px; }\n\n.book-cover {\n  margin: 15px;\n  height: 220px;\n  width: 150px;\n  float: left;\n  position: relative;\n  overflow: hidden; }\n  .book-cover:hover .overlay {\n    opacity: 0.3; }\n\n.overlay {\n  position: absolute;\n  top: 0;\n  bottom: 0;\n  left: 0;\n  right: 0;\n  height: 100%;\n  width: 100%;\n  opacity: 0;\n  transition: .2s ease;\n  background-color: #ED4337; }\n\n.jumbotron {\n  height: 45vh;\n  width: 100%;\n  background-color: #48d09b;\n  padding: 0;\n  margin: 0;\n  display: -webkit-box;\n  display: -moz-box;\n  display: -ms-flexbox;\n  display: -webkit-flex;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  color: #FFF8F8; }\n\n.jumbo-404 {\n  display: flex;\n  flex-direction: column;\n  width: 100%;\n  height: 100%;\n  overflow: hidden; }\n\n.jumbo-names {\n  display: flex;\n  flex-direction: column;\n  justify-content: center;\n  align-items: center;\n  flex-grow: 1; }\n  .jumbo-names h1 {\n    font-size: 60px; }\n  .jumbo-names h4 {\n    font-size: 21px; }\n\n.jumbo-404-names {\n  display: flex;\n  flex-direction: column;\n  justify-content: center;\n  align-items: center;\n  height: 500px; }\n  .jumbo-404-names h1 {\n    font-size: 60px; }\n  .jumbo-404-names h4 {\n    font-size: 21px; }\n\n.frontpage {\n  margin-top: 15px; }\n  .frontpage .features-list {\n    margin-bottom: 55px !important; }\n  .frontpage h4 {\n    font-weight: normal; }\n    .frontpage h4 a {\n      color: #555; }\n      .frontpage h4 ahover {\n        text-decoration: none; }\n\n.logo {\n  color: black; }\n  .logo :hover {\n    text-decoration: none; }\n", ""]);
+exports.push([module.i, ".profile_img {\n  height: auto;\n  margin-right: 15px !important;\n  border-radius: 2px; }\n\n.ui.menu {\n  margin-bottom: 0 !important;\n  border-radius: 0 !important; }\n\n.fa-book,\n.fa-paper-plane {\n  margin-right: 7px; }\n\n.my-books {\n  margin: 20px; }\n\n.from-list:hover {\n  background-color: #48d09b; }\n\n.by-list {\n  transition: 0.15s ease-in-out; }\n  .by-list:hover {\n    background-color: #F06560; }\n\n.book-card {\n  -webkit-box-shadow: 0px 11px 21px -4px rgba(0, 0, 0, 0.75);\n  -moz-box-shadow: 0px 11px 21px -4px rgba(0, 0, 0, 0.75);\n  box-shadow: 0px 11px 21px -4px rgba(0, 0, 0, 0.75);\n  height: 220px !important;\n  margin-bottom: 30px; }\n\n.book-cover {\n  margin: 15px;\n  height: 220px;\n  width: 150px;\n  float: left;\n  position: relative;\n  overflow: hidden; }\n  .book-cover:hover .overlay, .book-cover:hover .overlay-request {\n    opacity: 0.7; }\n\n.overlay {\n  position: absolute;\n  top: 0;\n  bottom: 0;\n  left: 0;\n  right: 0;\n  height: 100%;\n  width: 100%;\n  opacity: 0;\n  transition: .2s ease;\n  background-color: #ED4337;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  color: #FFF8F8;\n  font-size: 100px; }\n\n.overlay-request {\n  position: absolute;\n  top: 0;\n  bottom: 0;\n  left: 0;\n  right: 0;\n  height: 100%;\n  width: 100%;\n  opacity: 0;\n  transition: .2s ease;\n  background-color: #3366CC;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  color: #FFF8F8;\n  font-size: 100px; }\n\n.jumbotron {\n  height: 45vh;\n  width: 100%;\n  background-color: #48d09b;\n  padding: 0;\n  margin: 0;\n  display: -webkit-box;\n  display: -moz-box;\n  display: -ms-flexbox;\n  display: -webkit-flex;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  color: #FFF8F8; }\n\n.jumbo-404 {\n  display: flex;\n  flex-direction: column;\n  width: 100%;\n  height: 100%;\n  overflow: hidden; }\n\n.jumbo-names {\n  display: flex;\n  flex-direction: column;\n  justify-content: center;\n  align-items: center;\n  flex-grow: 1; }\n  .jumbo-names h1 {\n    font-size: 60px; }\n  .jumbo-names h4 {\n    font-size: 21px; }\n\n.jumbo-404-names {\n  display: flex;\n  flex-direction: column;\n  justify-content: center;\n  align-items: center;\n  height: 500px; }\n  .jumbo-404-names h1 {\n    font-size: 60px; }\n  .jumbo-404-names h4 {\n    font-size: 21px; }\n\n.frontpage {\n  margin-top: 15px; }\n  .frontpage .features-list {\n    margin-bottom: 55px !important; }\n  .frontpage h4 {\n    font-weight: normal; }\n    .frontpage h4 a {\n      color: #555; }\n      .frontpage h4 ahover {\n        text-decoration: none; }\n\n.logo {\n  color: black; }\n  .logo :hover {\n    text-decoration: none; }\n", ""]);
 
 // exports
 
@@ -71835,6 +71983,8 @@ Object.defineProperty(exports, "__esModule", {
     value: true
 });
 
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
 function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
 
 exports.default = function () {
@@ -71857,11 +72007,283 @@ exports.default = function () {
                     return item._id !== action.payload;
                 })
             };
+        case 'TRADE_BOOK':
+            return {
+                items: state.items.map(function (item) {
+                    if (item._id == action.payload.book) {
+                        return _extends({}, item, {
+                            requested: {
+                                by: action.payload.user,
+                                value: true
+                            }
+                        });
+                    }
+                    return item;
+                })
+            };
+        case 'TRY_DENY':
+            return {
+                items: state.items.map(function (item) {
+                    if (item._id == action.payload) {
+                        return _extends({}, item, {
+                            requested: {
+                                by: '',
+                                value: false
+                            }
+                        });
+                    }
+                    return item;
+                })
+            };
+        case 'TRY_CONFIRM':
+            return {
+                items: state.items.map(function (item) {
+                    if (item._id == action.payload) {
+                        return _extends({}, item, {
+                            owner: item.requested.by,
+                            requested: {
+                                by: '',
+                                value: false
+                            }
+                        });
+                    }
+                    return item;
+                })
+            };
 
         default:
             return state;
     }
 };
+
+/***/ }),
+/* 974 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _react = __webpack_require__(1);
+
+var _react2 = _interopRequireDefault(_react);
+
+var _propTypes = __webpack_require__(20);
+
+var _propTypes2 = _interopRequireDefault(_propTypes);
+
+var _reactRouterDom = __webpack_require__(80);
+
+var _semanticUiReact = __webpack_require__(146);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var MyBooks = function (_Component) {
+  _inherits(MyBooks, _Component);
+
+  function MyBooks(props) {
+    _classCallCheck(this, MyBooks);
+
+    return _possibleConstructorReturn(this, (MyBooks.__proto__ || Object.getPrototypeOf(MyBooks)).call(this, props));
+  }
+
+  _createClass(MyBooks, [{
+    key: 'searchBook',
+    value: function searchBook() {
+      if (this.Input.value.length > 0) {
+        this.props.searchBook(this.props.id, this.Input.value);
+        this.Input.value = '';
+      } else {
+        this.Input.focus();
+      }
+    }
+  }, {
+    key: 'render',
+    value: function render() {
+      var _this2 = this;
+
+      if (this.props.auth) {
+        var showRequestedBy = false;
+        var RequestedBy = 0;
+        var showRequestedFrom = false;
+        var RequestedFrom = 0;
+        this.props.books.forEach(function (item) {
+          if (item.requested.by === _this2.props.id && item.requested.value) {
+            RequestedBy++;
+            showRequestedBy = true;
+          }
+          if (item.requested.value && item.owner === _this2.props.id) {
+            RequestedFrom++;
+            showRequestedFrom = true;
+          }
+        });
+        return _react2.default.createElement(
+          'div',
+          null,
+          _react2.default.createElement(
+            _semanticUiReact.Container,
+            { className: 'my-books' },
+            _react2.default.createElement(
+              _semanticUiReact.Grid,
+              { divided: 'vertically' },
+              _react2.default.createElement(
+                _semanticUiReact.Grid.Row,
+                { columns: 2 },
+                _react2.default.createElement(
+                  _semanticUiReact.Grid.Column,
+                  null,
+                  _react2.default.createElement(
+                    _semanticUiReact.Segment,
+                    { color: 'yellow' },
+                    'Requested books (',
+                    RequestedBy,
+                    '):'
+                  ),
+                  showRequestedBy ? _react2.default.createElement(
+                    _semanticUiReact.Segment.Group,
+                    null,
+                    this.props.books.map(function (item) {
+                      if (item.requested.by == _this2.props.id && item.requested.value) {
+                        return _react2.default.createElement(
+                          _semanticUiReact.Segment,
+                          { onClick: function onClick() {
+                              return _this2.props.denyTrade(item._id);
+                            }, className: 'by-list', key: item._id },
+                          item.name
+                        );
+                      }
+                    })
+                  ) : null
+                ),
+                _react2.default.createElement(
+                  _semanticUiReact.Grid.Column,
+                  null,
+                  _react2.default.createElement(
+                    _semanticUiReact.Segment,
+                    { color: 'violet' },
+                    'Books requested from you (',
+                    RequestedFrom,
+                    '):'
+                  ),
+                  showRequestedFrom ? _react2.default.createElement(
+                    _semanticUiReact.Segment.Group,
+                    null,
+                    this.props.books.map(function (item) {
+                      if (item.owner == _this2.props.id && item.requested.value) {
+                        return _react2.default.createElement(
+                          _semanticUiReact.Segment,
+                          { onClick: function onClick() {
+                              return _this2.props.confirmTrade(_this2.props.id, item._id);
+                            }, className: 'from-list', key: item._id },
+                          item.name
+                        );
+                      }
+                    })
+                  ) : null
+                )
+              )
+            ),
+            _react2.default.createElement('div', {
+              style: {
+                clear: 'both',
+                marginBottom: '25px'
+              } }),
+            ' ',
+            this.props.books.map(function (item) {
+
+              return _react2.default.createElement(
+                'div',
+                { key: item._id, className: 'book-cover' },
+                _react2.default.createElement(_semanticUiReact.Image, { className: 'book-card', src: item.image, alt: item.name, size: 'small' }),
+                _react2.default.createElement(
+                  'div',
+                  {
+                    onClick: _this2.props.id !== item.owner && !item.requested.value ? function () {
+                      return _this2.props.tradeBook(item._id, _this2.props.id);
+                    } : null,
+                    className: _this2.props.id !== item.owner && !item.requested.value ? "overlay-request" : '' },
+                  _react2.default.createElement('i', { className: 'fa fa-exchange', 'aria-hidden': 'true' })
+                )
+              );
+            })
+          )
+        );
+      }
+      return _react2.default.createElement(_reactRouterDom.Redirect, { to: '/' });
+    }
+  }]);
+
+  return MyBooks;
+}(_react.Component);
+
+MyBooks.propTypes = {
+  auth: _propTypes2.default.bool.isRequired,
+  tradeBook: _propTypes2.default.func.isRequired,
+  denyTrade: _propTypes2.default.func.isRequired,
+  confirmTrade: _propTypes2.default.func.isRequired,
+  id: _propTypes2.default.number,
+  books: _propTypes2.default.array
+};
+
+exports.default = MyBooks;
+
+/***/ }),
+/* 975 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _react = __webpack_require__(1);
+
+var _react2 = _interopRequireDefault(_react);
+
+var _reactRedux = __webpack_require__(79);
+
+var _AllBooksPage = __webpack_require__(974);
+
+var _AllBooksPage2 = _interopRequireDefault(_AllBooksPage);
+
+var _actions = __webpack_require__(150);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var AllBooksPage = (0, _reactRedux.connect)(function (state) {
+  return {
+    auth: state.auth.value,
+    id: state.auth.user.id,
+    books: state.book.items
+  };
+}, function (dispatch) {
+  return {
+    tradeBook: function tradeBook(bookID, userID) {
+      return dispatch((0, _actions.tradeBook)(bookID, userID));
+    },
+    confirmTrade: function confirmTrade(newOwner, id) {
+      return dispatch((0, _actions.confirmTrade)(newOwner, id));
+    },
+    denyTrade: function denyTrade(id) {
+      return dispatch((0, _actions.denyTrade)(id));
+    }
+  };
+})(_AllBooksPage2.default);
+
+exports.default = AllBooksPage;
 
 /***/ })
 /******/ ]);

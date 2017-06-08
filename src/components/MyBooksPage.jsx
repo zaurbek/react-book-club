@@ -22,15 +22,44 @@ class MyBooks extends Component {
 
 
         <Container className="my-books">
+          <Grid divided='vertically'>
+              <Grid.Row columns={2}>
+                <Grid.Column>
+                  <Segment color='yellow'>Requested books ({RequestedBy}):</Segment>
+                  {showRequestedBy?
+                  <Segment.Group>
+                    {this.props.books.map(item=>{
+                      if (item.requested.by==this.props.id&&item.requested.value) {
+                        return <Segment onClick={()=>this.props.denyTrade(item._id)}className='by-list'  key={item._id}>{item.name}</Segment>
+                      }
+                      
+                    })}
+                  </Segment.Group>:null}
+                  
+                </Grid.Column>
+                <Grid.Column>
+                  <Segment color='violet'>Books requested from you ({RequestedFrom}):</Segment>
+                  {showRequestedFrom?
+                  <Segment.Group>
+                    {this.props.books.map(item=>{
+                      if (item.owner==this.props.id&&item.requested.value) {
+                        return <Segment onClick={()=>this.props.confirmTrade(this.props.id, item._id)} className='from-list' key={item._id}>{item.name}</Segment>
+                      }
+                      
+                    })}
+                  </Segment.Group>:null}
+                </Grid.Column>
+              </Grid.Row>
+            </Grid>
           <div className="ui input">
           <input type="text" ref={input => this.Input = input} placeholder="search for a book..." />
-          <Button secondary onClick={() => this.searchBook()}>Search for a Book</Button>
+          <Button secondary onClick={() => this.searchBook()}>Add a Book</Button>
         </div>
 
           <div style={{ clear: 'both', marginBottom: '25px' }} />
           {this.props.books.map((item) => {
-            if (item.owner==this.props.userID) {
-             return <div key={item._id} className='book-cover'><Image className='book-card' src={item.image} alt={item.name} size='small' /><div onClick={()=>this.props.deleteBook(item._id)}className='overlay'/></div>
+            if (item.owner==this.props.id) {
+             return <div key={item._id} className='book-cover'><Image className='book-card' src={item.image} alt={item.name} size='small' /><div onClick={()=>this.props.deleteBook(item._id)}className='overlay'><i className="fa fa-times" aria-hidden="true"/></div></div>
             }
             })}
         </Container>
@@ -44,9 +73,10 @@ class MyBooks extends Component {
 
 MyBooks.propTypes = {
   auth: PropTypes.bool.isRequired,
-  userID: PropTypes.number,
   id: PropTypes.number,
   books: PropTypes.array,
+  denyTrade: PropTypes.func.isRequired,
+  confirmTrade: PropTypes.func.isRequired,
   searchBook: PropTypes.func.isRequired,
   deleteBook: PropTypes.func.isRequired,
 };
